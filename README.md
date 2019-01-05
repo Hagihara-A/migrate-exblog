@@ -24,8 +24,7 @@ if __name__ == '__main__':
                      selector_title='.POST_TTL',
                      selector_body='.POST_CON',
                      selector_date='.TIME',
-                     output_path=Path('migrate.mt.txt'))
-                   ```
+                     output_path=Path('migrate.mt.txt'))```
 
 - isTest: Trueにした場合、特定の月のみを出力して、試すことが出来ます。この時引数test_yearとtest_monthの値が使われます。yearsは無視されます。
 Flaseにした場合、yearsで指定した範囲の記事を全て出力します。また、この時test_yearとtest_monthは無視されます。
@@ -37,6 +36,7 @@ Flaseにした場合、yearsで指定した範囲の記事を全て出力しま�
 - selector_body: 本文の親要素のCSSセレクタを指定します。
 - selector_date: 投稿日時の親要素のCSSセレクタを指定します。
 - output_path: Movable Typeのテキストの名前です。
+
 全て指定した後
 ```bash
 python makeMTtext.py
