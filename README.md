@@ -43,13 +43,39 @@ python makeMTtext.py
 ```
 でエクスポートできます。
 ## デモ
+```python
+if __name__ == '__main__':
+    exe = ExecStream(isTest=True,
+                     url='https://staff.exblog.jp/',
+                     years=(2000, 2020),
+                     test_year=2018,
+                     test_month=12,
+                     excludeFunc=lambda y, m: True,
+                     container_path=Path('entries'),
+                     selector_entry='.post',
+                     selector_title='.post-title',
+                     selector_body='.post-main',
+                     selector_date='.TIME',
+                     output_path=Path('migrate.mt.txt'))
+```
+とすればスタッフブログの2018年12月の記事を出力できます。
 
-## Requirement
+```python
+if __name__ == '__main__':
+    exe = ExecStream(isTest=False,
+                     url='https://staff.exblog.jp/',
+                     years=(2017, 2018),
+                     test_year=2018,
+                     test_month=12,
+                     excludeFunc=lambda y, m: True,
+                     container_path=Path('entries'),
+                     selector_entry='.post',
+                     selector_title='.post-title',
+                     selector_body='.post-main',
+                     selector_date='.TIME',
+                     output_path=Path('migrate.mt.txt'))
+```
+とすればスタッフブログの2017年1月~2018年12月の記事をエクスポートできます。
 
-## Usage
-
-## Install
-
-## Contribution
-
-## Licence
+## ライセンス
+ライセンスはよくわからないのですが、自由に使って頂いて結構です。ただし作者はこのスクリプトによるあらゆる損害の責任を負いません。
