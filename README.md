@@ -27,22 +27,26 @@ Falseにした場合、yearsで指定した範囲の記事を全て出力しま�
 
 全て指定した後
 ```bash
-python makeMTtext.py
+python codes/makeMTtext.py
 ```
-でエクスポートできます。
+でエクスポートを実行できます。
 ## デモ
 ```bash
 git clone https://github.com/Hagihara-A/scrape-excite-blog.git
 cd scrape-excite-blog
 python codes/makeMTText.py
 ```
-とすればスタッフブログの2018年12月の記事を出力できます。
+とすればデフォルトで設定されている、スタッフブログの2018年12月の記事を出力できます。
 
-またinput.jsonの内容を以下のように編集すれば
+またinput.jsonの内容を以下のように編集して、
 ```json
 "isTest": false
+"years": [2000, 2019]
 ```
-スタッフブログの2018年1月~2018年12月の記事をエクスポートできます。
+```bash
+python codes/makeMTtext.py
+```
+とすればスタッフブログの2000年1月~2019年12月を走査し、記事をエクスポートできます。
 
 ## ライセンス
 MIT licenseです

@@ -68,7 +68,7 @@ if __name__ == '__main__':
     input_path = Path('../input.json')
     with input_path.open('r') as f:
         data = json.load(f)
-    dataWrapper(data, isTest=False, years=[2019, 2019])
+    dataWrapper(data)
 
     print('your input data is as follows')
     pprint(data)
