@@ -58,7 +58,6 @@ class ExecStream:
 
 
 if __name__ == '__main__':
-    
     exe = ExecStream(isTest=True,
                      url='',
                      years=(2000, 2020),
