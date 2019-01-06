@@ -28,7 +28,7 @@ if __name__ == '__main__':
 ```
 
 - isTest: Trueにした場合、特定の月のみを出力して、動作確認が出来ます。この時引数test_yearとtest_monthの値が使われます。yearsは無視されます。
-Flaseにした場合、yearsで指定した範囲の記事を全て出力します。また、この時test_yearとtest_monthは無視されます。
+Falseにした場合、yearsで指定した範囲の記事を全て出力します。また、この時test_yearとtest_monthは無視されます。
 - url: 出力したいブログのURLを入力してください
 - excludeFunc: 除外したい月があるときに利用します。特定の日の除外には対応していません。(year, month)という引数を受け取り、Falseを返すとその月はスキップされます。
 - container_path: 出力先のディレクトリ名を指定します。処理が終わった後は消していただいて結構です。

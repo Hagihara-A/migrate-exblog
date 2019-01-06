@@ -1,6 +1,8 @@
 from ConstructMTtext import ConstructMTtext
 from scrapeExciteBlog import ScrapeExciteBlog
 from pathlib import Path
+import json
+from pprint import pprint
 
 
 class ExecStream:
@@ -12,21 +14,21 @@ class ExecStream:
 
     def outputTest(self,
                    url,
-                   test_year=2018,
-                   test_month=12,
+                   test_year,
+                   test_month,
+                   selector_entry,
+                   selector_title,
+                   selector_body,
+                   selector_date,
                    container_path='entries',
-                   selector_entry='.POST',
-                   selector_title='.POST_TTL',
-                   selector_body='.POST_CON',
-                   selector_date='.TIME',
-                   output_path=Path('migrate.mt.txt'),
+                   output_path=Path('../migrate.mt.txt'),
                    mtTemplatePath=Path('mttemplate.txt'), **kwargs):
-        scraper = ScrapeExciteBlog(url,
-                                   container_path,
-                                   selector_entry,
-                                   selector_title,
-                                   selector_body,
-                                   selector_date)
+        scraper = ScrapeExciteBlog(url=url,
+                                   selector_entry=selector_entry,
+                                   selector_title=selector_title,
+                                   selector_body=selector_body,
+                                   selector_date=selector_date,
+                                   container_path=container_path)
         dayEntries = scraper.scrapeSinglePage(year=test_year, month=test_month)
         maker = ConstructMTtext(output_path=output_path)
         MTtext = maker.constructMTtextFromDayEntries(dayEntries)
@@ -34,39 +36,40 @@ class ExecStream:
 
     def scrapeAll(self,
                   url,
-                  years=(2000, 2019),
+                  selector_entry,
+                  selector_title,
+                  selector_body,
+                  selector_date,
+                  years,
                   excludeFunc=lambda y, m: True,
                   container_path='entries',
-                  selector_entry='.POST',
-                  selector_title='.POST_TTL',
-                  selector_body='.POST_CON',
-                  selector_date='.TIME',
-                  output_path=Path('migrate.mt.txt'),
+                  output_path=Path('../migrate.mt.txt'),
                   mtTemplatePath=Path('mttemplate.txt'), **kwargs):
 
-        scraper = ScrapeExciteBlog(url,
-                                   container_path,
-                                   selector_entry,
-                                   selector_title,
-                                   selector_body,
-                                   selector_date)
+        scraper = ScrapeExciteBlog(url=url,
+                                   selector_entry=selector_entry,
+                                   selector_title=selector_title,
+                                   selector_body=selector_body,
+                                   selector_date=selector_date,
+                                   container_path=container_path)
         scraper.scrapeEntirePagesAndPickle(years=years, excludeFunc=excludeFunc)
         monthEntries = scraper.loadEveryMonthEntry()
-        maker = ConstructMTtext(output_path=Path('migrate.mt.txt'))
+        maker = ConstructMTtext(output_path=output_path)
         MTtext = maker.constructMTtextFromMonthEntries(monthEntries)
         maker.saveMTtext(MTtext)
 
 
+def dataWrapper(data, **kwargs):
+    for i, v in kwargs.items():
+        data[i] = v
+
+
 if __name__ == '__main__':
-    exe = ExecStream(isTest=True,
-                     url='',
-                     years=(2000, 2020),
-                     test_year=2018,
-                     test_month=12,
-                     excludeFunc=lambda y, m: True,
-                     container_path=Path('entries'),
-                     selector_entry='.POST',
-                     selector_title='.POST_TTL',
-                     selector_body='.POST_CON',
-                     selector_date='.TIME',
-                     output_path=Path('migrate.mt.txt'))
+    input_path = Path('../input.json')
+    with input_path.open('r') as f:
+        data = json.load(f)
+    dataWrapper(data, isTest=False, years=[2019, 2019])
+
+    print('your input data is as follows')
+    pprint(data)
+    exe = ExecStream(**data)

@@ -10,11 +10,11 @@ import urllib
 class ScrapeExciteBlog:
         def __init__(self,
                      url,
-                     container_path,
-                     selector_entry='.POST',
-                     selector_title='.POST_TTL',
-                     selector_body='.POST_CON',
-                     selector_date='.TIME'):
+                     selector_entry,
+                     selector_title,
+                     selector_body,
+                     selector_date,
+                     container_path=Path('entries')):
             self.url = self.urlValidation(url)
             self.container_path = self.container_pathValidation(container_path)
             self.selector_entry = self.selectorValidation(selector_entry)
@@ -110,13 +110,14 @@ class ScrapeExciteBlog:
                 dayEntries = self.scrapeDayEntriesFromMonthPage(url)
                 self.pickleDayEntries(dayEntries, y, m)
 
-        def makeDateIter(self, years=(2005, 2019), excludeFunc=lambda y, m: True):
-            for year in range(years[0], years[1] + 1):
+        def makeDateIter(self, years, excludeFunc=lambda y, m: True):
+            years[1] += 1
+            for year in range(*years):
                 for month in range(1, 13):
                     if excludeFunc(year, month):
                         yield (year, month)
 
-        def scrapeEntirePagesAndPickle(self, years=(2005, 2019), excludeFunc=lambda y, m: True):
+        def scrapeEntirePagesAndPickle(self, years, excludeFunc=lambda y, m: True):
             date_iter = self.makeDateIter(years=years, excludeFunc=excludeFunc)
             self.scrapeAndPickleWithDateIter(date_iter)
 

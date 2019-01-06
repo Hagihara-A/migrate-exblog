@@ -4,7 +4,7 @@ from pathlib import Path
 class ConstructMTtext:
     def __init__(self,
                  mtTemplatePath=Path('mttemplate.txt'),
-                 output_path=Path('migrate.mt.txt')):
+                 output_path=Path('../migrate.mt.txt')):
         path = self.template_pathValidation(mtTemplatePath)
         self.output_path = self.template_pathValidation(output_path)
         with path.open('r') as f:
