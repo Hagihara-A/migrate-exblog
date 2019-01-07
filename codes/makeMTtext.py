@@ -71,7 +71,7 @@ def main():
     input_path = Path(__file__).resolve().parents[1] / 'input.json'
     with input_path.open('r') as f:
         data = json.load(f)
-    dataWrapper(data, output_path=ABS_PATH.parents[1] / 'migrate.mt.txt', isTest=False)
+    dataWrapper(data)
 
     print('your input data is as follows')
     pprint(data)
