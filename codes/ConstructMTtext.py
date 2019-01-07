@@ -1,10 +1,12 @@
 from pathlib import Path
 
+ABS_PATH = Path(__file__).resolve()
+
 
 class ConstructMTtext:
     def __init__(self,
-                 mtTemplatePath=Path('mttemplate.txt'),
-                 output_path=Path('../migrate.mt.txt')):
+                 mtTemplatePath=ABS_PATH.parent / 'mttemplate.txt',
+                 output_path=ABS_PATH.parents[1] / 'migrate.mt.txt'):
         path = self.template_pathValidation(mtTemplatePath)
         self.output_path = self.template_pathValidation(output_path)
         with path.open('r') as f:

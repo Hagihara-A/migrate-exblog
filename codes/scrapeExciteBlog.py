@@ -110,6 +110,15 @@ class ScrapeExciteBlog:
                 dayEntries = self.scrapeDayEntriesFromMonthPage(url)
                 self.pickleDayEntries(dayEntries, y, m)
 
+        def scrapeButPickleWithDateIter(self, date_iter):
+            monthEntries = []
+            for y, m in date_iter:
+                print(f'now processing {y}/{m}')
+                url = self.constructUrl(y, m)
+                dayEntries = self.scrapeDayEntriesFromMonthPage(url)
+                monthEntries.append(dayEntries)
+            return monthEntries
+
         def makeDateIter(self, years, excludeFunc=lambda y, m: True):
             years[1] += 1
             for year in range(*years):
@@ -120,6 +129,10 @@ class ScrapeExciteBlog:
         def scrapeEntirePagesAndPickle(self, years, excludeFunc=lambda y, m: True):
             date_iter = self.makeDateIter(years=years, excludeFunc=excludeFunc)
             self.scrapeAndPickleWithDateIter(date_iter)
+
+        def scrapeEntirePagesButPickle(self, years, excludeFunc=lambda y, m: True):
+            date_iter = self.makeDateIter(years=years, excludeFunc=excludeFunc)
+            return self.scrapeButPickleWithDateIter(date_iter=date_iter)
 
         def loadEveryMonthEntry(self, deserialize=True):
             monthEntries = self.container_path.glob('**/*.pickle')
