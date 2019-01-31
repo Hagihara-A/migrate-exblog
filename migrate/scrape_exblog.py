@@ -21,8 +21,8 @@ class ScrapeExblog:
         self.selector_body = self.validate_selector(selector_body)
         self.selector_date = self.validate_selector(selector_date)
 
-        self.years = None
-        self.exclude_func = lambda x: True
+        self.exclude_func = lambda *x: True
+        self.entries = []
 
     def validate_url(self, url):
         if isinstance(url, str):
@@ -93,52 +93,50 @@ class ScrapeExblog:
     def validateTag(self, items):
         return items[0]
 
-    def constructUrl(self, year, month):
-        entryUrl = datetime(year, month, 1)
-        url_str = entryUrl.strftime('m%Y-%m-%d')
+    def make_month_archive_url(self, year, month):
+        anchive_url = datetime(year, month, 1)
+        url_str = anchive_url.strftime('m%Y-%m-%d')
         return urllib.parse.urljoin(self.url.geturl(), url_str)
 
     def scrapeWithDateIter(self, date_iter):
-        monthEntries = []
         for y, m in date_iter:
             print(f'now processing {y}/{m}')
-            url = self.constructUrl(y, m)
+            url = self.make_month_archive_url(y, m)
             dayEntries = self.scrapeDayEntriesFromMonthPage(url)
-            monthEntries.append(dayEntries)
-        return monthEntries
+            self.entries.extend(dayEntries)
 
     def date_iter(self):
-        self.years[1] += 1
-        for year in range(*self.years):
+        for year in range(self._years[0], self._years[1] + 1):
             for month in range(1, 13):
-                if self.excludeFunc(year, month):
+                if self._exclude_func(year, month):
                     yield (year, month)
 
     def scrape(self):
-        date_iter = self.date_iter
-        return self.scrapeWithDateIter(date_iter=date_iter)
+        date_iter = self.date_iter()
+        self.scrapeWithDateIter(date_iter=date_iter)
+        return self.entries
 
     @property
     def years(self):
         return self.years
 
     @years.setter
-    def year(self, years):
+    def years(self, years):
         if isinstance(years, int):
-            years = [years, years]
-            self.years = years
-        elif isinstance(years, list):
-            self.years = years
+            years = (years, years)
+            self._years = years
+        elif isinstance(years, tuple) and len(years) == 2:
+            self._years = years
         else:
-            raise TypeError('years must be int pr list')
+            raise TypeError('years must be int or list')
 
     @property
     def exclude_func(self):
-        return self.exclude_func
+        return self._exclude_func
 
     @exclude_func.setter
     def exclude_func(self, func):
         if isinstance(func, types.FunctionType):
-            self.exclude_func = func
+            self._exclude_func = func
         else:
             raise TypeError('exclude_func must be function')
