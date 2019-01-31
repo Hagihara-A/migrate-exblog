@@ -1,1 +1,14 @@
-{"isTest": true, "url": "https://staff.exblog.jp/", "years": [2018, 2019], "test_year": 2018, "test_month": 12, "selector_entry": ".post", "selector_title": ".post-title", "selector_body": ".post-main", "selector_date": ".TIME"}
+{
+    "isTest": true,
+    "url": "https://staff.exblog.jp/",
+    "years": [
+        2018,
+        2019
+    ],
+    "test_year": 2018,
+    "test_month": 12,
+    "selector_entry": ".post",
+    "selector_title": ".post-title",
+    "selector_body": ".post-main",
+    "selector_date": ".TIME"
+}

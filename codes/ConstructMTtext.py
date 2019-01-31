@@ -7,12 +7,12 @@ class ConstructMTtext:
     def __init__(self,
                  mtTemplatePath=ABS_PATH.parent / 'mttemplate.txt',
                  output_path=ABS_PATH.parents[1] / 'migrate.mt.txt'):
-        path = self.template_pathValidation(mtTemplatePath)
-        self.output_path = self.template_pathValidation(output_path)
+        path = self.pathValidation(mtTemplatePath)
+        self.output_path = self.pathValidation(output_path)
         with path.open('r') as f:
             self.MTtemplate = f.read()
 
-    def template_pathValidation(self, path):
+    def pathValidation(self, path):
         if isinstance(path, Path):
             return path
         elif isinstance(path, str):

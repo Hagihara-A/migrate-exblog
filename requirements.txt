@@ -1,8 +1,0 @@
-python3.6
-pathlib
-requests
-re
-pickle
-datetime
-bs4
-urllib
