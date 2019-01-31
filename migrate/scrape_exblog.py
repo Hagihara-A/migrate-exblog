@@ -1,28 +1,30 @@
-import requests
 import re
-from pathlib import Path
-import pickle
-from datetime import datetime
-from bs4 import BeautifulSoup, Comment
+import types
 import urllib
+from datetime import datetime
+from pathlib import Path
+
+import requests
+from bs4 import BeautifulSoup, Comment
 
 
-class ScrapeExciteBlog:
+class ScrapeExblog:
     def __init__(self,
                  url,
                  selector_entry,
                  selector_title,
                  selector_body,
-                 selector_date,
-                 container_path=Path('entries')):
-        self.url = self.urlValidation(url)
-        self.container_path = self.container_pathValidation(container_path)
-        self.selector_entry = self.selectorValidation(selector_entry)
-        self.selector_title = self.selectorValidation(selector_title)
-        self.selector_body = self.selectorValidation(selector_body)
-        self.selector_date = self.selectorValidation(selector_date)
+                 selector_date):
+        self.url = self.validate_url(url)
+        self.selector_entry = self.validate_selector(selector_entry)
+        self.selector_title = self.validate_selector(selector_title)
+        self.selector_body = self.validate_selector(selector_body)
+        self.selector_date = self.validate_selector(selector_date)
 
-    def urlValidation(self, url):
+        self.years = None
+        self.exclude_func = lambda x: True
+
+    def validate_url(self, url):
         if isinstance(url, str):
             return urllib.parse.urlparse(url)
         elif isinstance(url, urllib.parse.ParseResult):
@@ -31,7 +33,7 @@ class ScrapeExciteBlog:
             raise TypeError(
                 'url must be "str" or "urllib.parse.ParseResult" object')
 
-    def container_pathValidation(self, container_path):
+    def validate_container_path(self, container_path):
         if isinstance(container_path, Path):
             return container_path
         elif isinstance(container_path, str):
@@ -40,7 +42,7 @@ class ScrapeExciteBlog:
             raise TypeError(
                 'container_path must be "str" or "pathlib.Path" object')
 
-    def selectorValidation(self, selector):
+    def validate_selector(self, selector):
         if isinstance(selector, str):
             return selector
         else:
@@ -96,25 +98,7 @@ class ScrapeExciteBlog:
         url_str = entryUrl.strftime('m%Y-%m-%d')
         return urllib.parse.urljoin(self.url.geturl(), url_str)
 
-    def pickleDayEntries(self, data, year, month):
-        if not data:
-            return
-        dir = self.container_path / f'{year}'
-        if not dir.exists():
-            dir.mkdir(parents=True)
-
-        file = dir / f'{month}.pickle'
-        with file.open('wb') as f:
-            pickle.dump(data, f)
-
-    def scrapeAndPickleWithDateIter(self, date_iter):
-        for y, m in date_iter:
-            print(f'now processing {y}/{m}')
-            url = self.constructUrl(y, m)
-            dayEntries = self.scrapeDayEntriesFromMonthPage(url)
-            self.pickleDayEntries(dayEntries, y, m)
-
-    def scrapeButPickleWithDateIter(self, date_iter):
+    def scrapeWithDateIter(self, date_iter):
         monthEntries = []
         for y, m in date_iter:
             print(f'now processing {y}/{m}')
@@ -123,31 +107,38 @@ class ScrapeExciteBlog:
             monthEntries.append(dayEntries)
         return monthEntries
 
-    def makeDateIter(self, years, excludeFunc=lambda y, m: True):
-        years[1] += 1
-        for year in range(*years):
+    def date_iter(self):
+        self.years[1] += 1
+        for year in range(*self.years):
             for month in range(1, 13):
-                if excludeFunc(year, month):
+                if self.excludeFunc(year, month):
                     yield (year, month)
 
-    def scrapeEntirePagesAndPickle(self, years, excludeFunc=lambda y, m: True):
-        date_iter = self.makeDateIter(years=years, excludeFunc=excludeFunc)
-        self.scrapeAndPickleWithDateIter(date_iter)
+    def scrape(self):
+        date_iter = self.date_iter
+        return self.scrapeWithDateIter(date_iter=date_iter)
 
-    def scrapeEntirePagesButPickle(self, years, excludeFunc=lambda y, m: True):
-        date_iter = self.makeDateIter(years=years, excludeFunc=excludeFunc)
-        return self.scrapeButPickleWithDateIter(date_iter=date_iter)
+    @property
+    def years(self):
+        return self.years
 
-    def loadEveryMonthEntry(self, deserialize=True):
-        monthEntries = self.container_path.glob('**/*.pickle')
-        if deserialize:
-            def deserializer(pickledFile):
-                with pickledFile.open('rb') as f:
-                    return pickle.load(f)
-            monthEntries = list(map(deserializer, monthEntries))
+    @years.setter
+    def year(self, years):
+        if isinstance(years, int):
+            years = [years, years]
+            self.years = years
+        elif isinstance(years, list):
+            self.years = years
+        else:
+            raise TypeError('years must be int pr list')
 
-        return monthEntries
+    @property
+    def exclude_func(self):
+        return self.exclude_func
 
-    def scrapeSinglePage(self, year, month):
-        return self.scrapeEntirePagesButPickle(years=(year, year),
-                                               excludeFunc=lambda y, m: m != month)
+    @exclude_func.setter
+    def exclude_func(self, func):
+        if isinstance(func, types.FunctionType):
+            self.exclude_func = func
+        else:
+            raise TypeError('exclude_func must be function')

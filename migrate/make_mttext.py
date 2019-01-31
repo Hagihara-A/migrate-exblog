@@ -1,5 +1,5 @@
-from ConstructMTtext import ConstructMTtext
-from scrapeExciteBlog import ScrapeExciteBlog
+from parse_entries import ConstructMTtext
+from scrape_exblog import ScrapeExblog
 from pathlib import Path
 import json
 from pprint import pprint
@@ -26,12 +26,12 @@ class ExecStream:
                    output_path=ABS_PATH.parents[1] / 'migrate.mt.txt',
                    mtTemplatePath=ABS_PATH.parent / 'mttemplate.txt',
                    **kwargs):
-        scraper = ScrapeExciteBlog(url=url,
-                                   selector_entry=selector_entry,
-                                   selector_title=selector_title,
-                                   selector_body=selector_body,
-                                   selector_date=selector_date,
-                                   container_path=container_path)
+        scraper = ScrapeExblog(url=url,
+                               selector_entry=selector_entry,
+                               selector_title=selector_title,
+                               selector_body=selector_body,
+                               selector_date=selector_date,
+                               container_path=container_path)
         dayEntries = scraper.scrapeSinglePage(year=test_year, month=test_month)
         maker = ConstructMTtext(output_path=output_path)
         MTtext = maker.constructMTtextFromDayEntries(dayEntries)
@@ -50,13 +50,14 @@ class ExecStream:
                   mtTemplatePath=ABS_PATH.parent / 'mttemplate.txt',
                   **kwargs):
 
-        scraper = ScrapeExciteBlog(url=url,
-                                   selector_entry=selector_entry,
-                                   selector_title=selector_title,
-                                   selector_body=selector_body,
-                                   selector_date=selector_date,
-                                   container_path=container_path)
-        monthEntries = scraper.scrapeEntirePagesButPickle(years=years, excludeFunc=excludeFunc)
+        scraper = ScrapeExblog(url=url,
+                               selector_entry=selector_entry,
+                               selector_title=selector_title,
+                               selector_body=selector_body,
+                               selector_date=selector_date,
+                               container_path=container_path)
+        monthEntries = scraper.scrapeEntirePagesButPickle(
+            years=years, excludeFunc=excludeFunc)
         maker = ConstructMTtext(output_path=output_path)
         MTtext = maker.constructMTtextFromMonthEntries(monthEntries)
         maker.saveMTtext(MTtext)

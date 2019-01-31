@@ -1,12 +1,11 @@
 from unittest import TestCase
-from codes.makeMttext import datawrapper, ExecStream
-from codes.scrapeExciteBlog import ScrapeExciteBlog
-from codes.ConstructMTtext import ConstructMTtext
+from migrate.scrape_exblog import ScrapeExblog
+from migrate.parse_entries import ConstructMTtext
 from pathlib import Path
 import json
 
 
-class TestScpape(TestCase):
+class TestScrape(TestCase):
     def setUp(self):
         input_file = Path('input.json')
         with input_file.open('r') as f:
@@ -16,9 +15,9 @@ class TestScpape(TestCase):
         self.output_path = 'output.tmp.txt'
 
     def testDefaultInput(self):
-        scraper = ScrapeExciteBlog(**self.input_data)
+        scraper = ScrapeExblog(**self.input_data)
         entries = scraper.scrapeSinglePage(2018, 12)
-        maker = ConstructMTtext(output_path=)
+        maker = ConstructMTtext(self.output_path)
         MTtext = maker.constructMTtextFromMonthEntries(entries)
         maker.saveMTtext(MTtext)
         with open(self.output_path, 'r') as f:

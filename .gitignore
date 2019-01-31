@@ -121,3 +121,5 @@ pyvenv.cfg
 lib64
 *.mt.txt
 .vscode
+share
+etc
