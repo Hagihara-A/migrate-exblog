@@ -7,9 +7,10 @@ from time import sleep
 
 import requests
 from bs4 import BeautifulSoup, Comment
+from tqdm import tqdm
 
 
-def get(*args, interval=0.5, **kwargs):
+def get(*args, interval=0.25, **kwargs):
     sleep(interval)
     return requests.get(*args, **kwargs)
 
@@ -97,10 +98,14 @@ class ScrapeExblog:
     def extruct_indv_urls_from_archive_soup(self, soup):
         indv_urls = []
         titles = soup.select(self.selector_title)
+
         for title in titles:
-            url = title.a.get('href')
-            if self.if_indv_url(url):
-                indv_urls.append(url)
+            try:
+                url = title.a.get('href')
+                if self.if_indv_url(url):
+                    indv_urls.append(url)
+            except AttributeError:
+                continue
         return indv_urls
 
     def if_indv_url(self, url):
@@ -117,8 +122,10 @@ class ScrapeExblog:
                     yield (year, month)
 
     def scrape(self):
+        entries = []
         indv_urls = self.get_indv_urls()
-        entries = map(self.parse_indv_page, indv_urls)
+        for i_url in tqdm(indv_urls):
+            entries.append(self.parse_indv_page(i_url))
         return list(entries)
 
     def parse_indv_page(self, indv_url):

@@ -28,6 +28,7 @@ def exec(data):
 
 
 def dataWrapper(data, **kwargs):
+    """for debug"""
     for i, v in kwargs.items():
         data[i] = v
 
@@ -36,7 +37,6 @@ def main():
     input_path = ABS_DIR / 'input.json'
     with input_path.open('r') as f:
         data = json.load(f)
-    dataWrapper(data)
 
     print('your input data is as follows')
     pprint(data)
