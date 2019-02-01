@@ -7,8 +7,6 @@ from time import sleep
 import requests
 from bs4 import BeautifulSoup, Comment
 
-from pdb import set_trace
-
 
 def get(*args, interval=0.5, **kwargs):
     sleep(interval)
@@ -63,29 +61,12 @@ class ScrapeExblog:
         else:
             raise TypeError('selector must be str')
 
-    def scrapeDayEntriesFromMonthPage(self, url_str):
-        soup = get_soup(url_str)
-        return self.fetchDayentriesFromSoup(soup)
 
-    def fetchDayentriesFromSoup(self, soup):
-        dayEntries = []
-        posts = soup.select(self.selector_post)
-        for post in posts:
-            try:
-                dayEntries.append(dict(
-                    title=self.extractTitle(post),
-                    body=self.extractBody(post),
-                    date=self.extractDate(post),
-                ))
-            except (IndexError, AttributeError):
-                continue
-        return dayEntries
-
-    def extractTitle(self, post):
+    def parse_title(self, post):
         ttl = post.select_one(self.selector_title)
         return ttl.get_text().strip()
 
-    def extractBody(self, post):
+    def parse_body(self, post):
         con = post.select_one(self.selector_body)
         divs = con.find_all(
             class_=['sm_icon_mini', 'ad-yads_common', 'bbs_preview', 'exblog_cpc', 'clear'])
@@ -94,7 +75,7 @@ class ScrapeExblog:
             text=lambda x: isinstance(x, Comment))]
         return str(con)
 
-    def extractDate(self, soup):
+    def parse_date(self, soup):
         footer = soup.select_one(self.selector_foot)
         time = footer.select_one('.TIME')
         anchor = time.find('a', text=re.compile(r'^\d{4}-\d{1,2}-\d{1,2}'))
@@ -144,9 +125,9 @@ class ScrapeExblog:
         soup = get_soup(indv_url)
         post = soup.select_one(self.selector_post)
         entry = {
-            'title': self.extractTitle(post),
-            'body': self.extractBody(post),
-            'date': self.extractDate(post)
+            'title': self.parse_title(post),
+            'body': self.parse_body(post),
+            'date': self.parse_date(post)
         }
         return entry
 
