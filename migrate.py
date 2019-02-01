@@ -38,9 +38,9 @@ def main():
     with input_path.open('r') as f:
         data = json.load(f)
 
-    print('your input data is as follows')
+    print('your input data is as follows:')
     pprint(data)
-    input('OK?')
+    input('OK? press any key.')
     entries = exec(data)
     parser = ConstructMTtext()
     mttext = parser.make_mttext(entries)
