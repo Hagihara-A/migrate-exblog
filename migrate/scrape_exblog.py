@@ -24,16 +24,16 @@ def get_soup(*args, **kwargs):
 class ScrapeExblog:
     def __init__(self,
                  url,
-                 selector_entry,
+                 selector_post,
                  selector_title,
                  selector_body,
-                 selector_date,
+                 selector_foot,
                  selector_time='.TIME'):
         self.url = self.validate_url(url)
-        self.selector_entry = self.validate_selector(selector_entry)
+        self.selector_post = self.validate_selector(selector_post)
         self.selector_title = self.validate_selector(selector_title)
         self.selector_body = self.validate_selector(selector_body)
-        self.selector_date = self.validate_selector(selector_date)
+        self.selector_foot = self.validate_selector(selector_foot)
         self.selector_time = self.validate_selector(selector_time)
 
         self.exclude_func = lambda *x: True
@@ -69,7 +69,7 @@ class ScrapeExblog:
 
     def fetchDayentriesFromSoup(self, soup):
         dayEntries = []
-        posts = soup.select(self.selector_entry)
+        posts = soup.select(self.selector_post)
         for post in posts:
             try:
                 dayEntries.append(dict(
@@ -95,8 +95,8 @@ class ScrapeExblog:
         return str(con)
 
     def extractDate(self, soup):
-        time = soup.select_one(self.selector_date)
-        time = time.select_one('.TIME')
+        footer = soup.select_one(self.selector_foot)
+        time = footer.select_one('.TIME')
         anchor = time.find('a', text=re.compile(r'^\d{4}-\d{1,2}-\d{1,2}'))
         time = anchor.get_text()
         return datetime.strptime(time, '%Y-%m-%d %H:%M')
@@ -142,7 +142,7 @@ class ScrapeExblog:
 
     def parse_indv_page(self, indv_url):
         soup = get_soup(indv_url)
-        post = soup.select_one(self.selector_entry)
+        post = soup.select_one(self.selector_post)
         entry = {
             'title': self.extractTitle(post),
             'body': self.extractBody(post),

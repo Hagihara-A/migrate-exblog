@@ -7,8 +7,8 @@
     ],
     "test_year": 2018,
     "test_month": 12,
-    "selector_entry": ".post",
+    "selector_post": ".post",
     "selector_title": ".post-title",
     "selector_body": ".post-main",
-    "selector_date": ".post-tail"
+    "selector_foot": ".post-tail"
 }
