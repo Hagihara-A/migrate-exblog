@@ -4,6 +4,7 @@ import urllib.parse as up
 from datetime import datetime
 from pathlib import Path
 from time import sleep
+
 import requests
 from bs4 import BeautifulSoup, Comment
 
@@ -61,19 +62,18 @@ class ScrapeExblog:
         else:
             raise TypeError('selector must be str')
 
-
     def parse_title(self, post):
         ttl = post.select_one(self.selector_title)
         return ttl.get_text().strip()
 
     def parse_body(self, post):
-        con = post.select_one(self.selector_body)
-        divs = con.find_all(
+        body = post.select_one(self.selector_body)
+        divs = body.find_all(
             class_=['sm_icon_mini', 'ad-yads_common', 'bbs_preview', 'exblog_cpc', 'clear'])
         [div.decompose() for div in divs]
-        [comment.extract() for comment in con.find_all(
+        [comment.extract() for comment in body.find_all(
             text=lambda x: isinstance(x, Comment))]
-        return str(con)
+        return body.prettify()
 
     def parse_date(self, soup):
         footer = soup.select_one(self.selector_foot)
