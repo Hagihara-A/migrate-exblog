@@ -10,5 +10,5 @@
     "selector_entry": ".post",
     "selector_title": ".post-title",
     "selector_body": ".post-main",
-    "selector_date": ".TIME"
+    "selector_date": ".post-tail"
 }

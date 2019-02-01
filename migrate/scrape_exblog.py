@@ -1,11 +1,24 @@
 import re
 import types
-import urllib
+import urllib.parse as up
 from datetime import datetime
 from pathlib import Path
-
+from time import sleep
 import requests
 from bs4 import BeautifulSoup, Comment
+
+from pdb import set_trace
+
+
+def get(*args, interval=0.5, **kwargs):
+    sleep(interval)
+    return requests.get(*args, **kwargs)
+
+
+def get_soup(*args, **kwargs):
+    res = get(*args, **kwargs)
+    res.encoding = res.apparent_encoding
+    return BeautifulSoup(res.content, 'lxml')
 
 
 class ScrapeExblog:
@@ -14,20 +27,22 @@ class ScrapeExblog:
                  selector_entry,
                  selector_title,
                  selector_body,
-                 selector_date):
+                 selector_date,
+                 selector_time='.TIME'):
         self.url = self.validate_url(url)
         self.selector_entry = self.validate_selector(selector_entry)
         self.selector_title = self.validate_selector(selector_title)
         self.selector_body = self.validate_selector(selector_body)
         self.selector_date = self.validate_selector(selector_date)
+        self.selector_time = self.validate_selector(selector_time)
 
         self.exclude_func = lambda *x: True
         self.entries = []
 
     def validate_url(self, url):
         if isinstance(url, str):
-            return urllib.parse.urlparse(url)
-        elif isinstance(url, urllib.parse.ParseResult):
+            return up.urlparse(url)
+        elif isinstance(url, up.ParseResult):
             return url
         else:
             raise TypeError(
@@ -49,9 +64,7 @@ class ScrapeExblog:
             raise TypeError('selector must be str')
 
     def scrapeDayEntriesFromMonthPage(self, url_str):
-        r = requests.get(url_str)
-        r.encoding = r.apparent_encoding
-        soup = BeautifulSoup(r.content, 'lxml')
+        soup = get_soup(url_str)
         return self.fetchDayentriesFromSoup(soup)
 
     def fetchDayentriesFromSoup(self, soup):
@@ -69,13 +82,11 @@ class ScrapeExblog:
         return dayEntries
 
     def extractTitle(self, post):
-        ttl = post.select(self.selector_title)
-        ttl = self.validateTag(ttl)
-        return ttl.get_text().replace('\u3000', '').strip()
+        ttl = post.select_one(self.selector_title)
+        return ttl.get_text().strip()
 
     def extractBody(self, post):
-        con = post.select(self.selector_body)
-        con = self.validateTag(con)
+        con = post.select_one(self.selector_body)
         divs = con.find_all(
             class_=['sm_icon_mini', 'ad-yads_common', 'bbs_preview', 'exblog_cpc', 'clear'])
         [div.decompose() for div in divs]
@@ -84,47 +95,75 @@ class ScrapeExblog:
         return str(con)
 
     def extractDate(self, soup):
-        time = soup.select(self.selector_date)
-        time = self.validateTag(time)
+        time = soup.select_one(self.selector_date)
+        time = time.select_one('.TIME')
         anchor = time.find('a', text=re.compile(r'^\d{4}-\d{1,2}-\d{1,2}'))
         time = anchor.get_text()
         return datetime.strptime(time, '%Y-%m-%d %H:%M')
 
-    def validateTag(self, items):
-        return items[0]
-
-    def make_month_archive_url(self, year, month):
-        anchive_url = datetime(year, month, 1)
+    def make_month_archive_url(self, y, m):
+        anchive_url = datetime(y, m, 1)
         url_str = anchive_url.strftime('m%Y-%m-%d')
-        return urllib.parse.urljoin(self.url.geturl(), url_str)
+        return up.urljoin(self.url.geturl(), url_str)
 
-    def scrapeWithDateIter(self, date_iter):
-        for y, m in date_iter:
-            print(f'now processing {y}/{m}')
-            url = self.make_month_archive_url(y, m)
-            dayEntries = self.scrapeDayEntriesFromMonthPage(url)
-            self.entries.extend(dayEntries)
+    def get_indv_url_from_month_archive_urls(self, archive_urls):
+        indv_urls = []
+        for arc_url in archive_urls:
+            soup = get_soup(arc_url)
+            indv_urls.extend(self.extruct_indv_urls_from_archive_soup(soup))
+        return indv_urls
+
+    def extruct_indv_urls_from_archive_soup(self, soup):
+        indv_urls = []
+        titles = soup.select(self.selector_title)
+        for title in titles:
+            url = title.a.get('href')
+            if self.if_indv_url(url):
+                indv_urls.append(url)
+        return indv_urls
+
+    def if_indv_url(self, url):
+        url = up.urlparse(url)
+        if url.netloc == self.url.netloc and re.search(r'\d{9}', url.path):
+            return True
+        else:
+            return False
 
     def date_iter(self):
-        for year in range(self._years[0], self._years[1] + 1):
+        for year in range(self.years[0], self.years[1] + 1):
             for month in range(1, 13):
-                if self._exclude_func(year, month):
+                if self.exclude_func(year, month):
                     yield (year, month)
 
     def scrape(self):
-        date_iter = self.date_iter()
-        self.scrapeWithDateIter(date_iter=date_iter)
-        return self.entries
+        indv_urls = self.get_indv_urls()
+        entries = map(self.parse_indv_page, indv_urls)
+        return list(entries)
+
+    def parse_indv_page(self, indv_url):
+        soup = get_soup(indv_url)
+        post = soup.select_one(self.selector_entry)
+        entry = {
+            'title': self.extractTitle(post),
+            'body': self.extractBody(post),
+            'date': self.extractDate(post)
+        }
+        return entry
+
+    def get_indv_urls(self):
+        dates = self.date_iter()
+        archive_urls = map(
+            lambda y_m: self.make_month_archive_url(*y_m), dates)
+        return self.get_indv_url_from_month_archive_urls(archive_urls)
 
     @property
     def years(self):
-        return self.years
+        return self._years
 
     @years.setter
     def years(self, years):
         if isinstance(years, int):
-            years = (years, years)
-            self._years = years
+            self._years = (years, years)
         elif isinstance(years, tuple) and len(years) == 2:
             self._years = years
         else:
