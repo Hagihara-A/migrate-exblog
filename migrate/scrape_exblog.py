@@ -24,12 +24,14 @@ def get_soup(*args, **kwargs):
 class ScrapeExblog:
     def __init__(self,
                  url,
+                 years,
                  selector_post,
                  selector_title,
                  selector_body,
                  selector_foot,
                  selector_time='.TIME'):
         self.url = self.validate_url(url)
+        self.years = years
         self.selector_post = self.validate_selector(selector_post)
         self.selector_title = self.validate_selector(selector_title)
         self.selector_body = self.validate_selector(selector_body)
@@ -152,10 +154,10 @@ class ScrapeExblog:
     def years(self, years):
         if isinstance(years, int):
             self._years = (years, years)
-        elif isinstance(years, tuple) and len(years) == 2:
+        elif isinstance(years, (tuple, list)) and len(years) == 2:
             self._years = years
         else:
-            raise TypeError('years must be int or list')
+            raise TypeError('years must be int or list or tuple(len==2)')
 
     @property
     def exclude_func(self):

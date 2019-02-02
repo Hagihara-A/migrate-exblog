@@ -12,7 +12,7 @@ cd scrape-excite-blog
 ここからはinput.jsonを編集します。input.jsonの内容はデフォルトで以下のようになっています
 ```json
 {
-    "isTest": true,
+    "is_test": true,
     "url": "https://staff.exblog.jp/",
     "years": [
         2018,
@@ -39,14 +39,14 @@ cd scrape-excite-blog
 
 全て指定した後
 ```bash
-python migrate.py
+python export.py
 ```
 でエクスポートを実行できます。migrate.mt.txtというファイルに出力されます。
 ## デモ
 ```bash
 git clone https://github.com/Hagihara-A/scrape-excite-blog.git
 cd scrape-excite-blog
-python migrate.py
+python export.py
 ```
 とすればデフォルトで設定されている、スタッフブログの2018年12月の記事を出力できます。
 
@@ -56,7 +56,7 @@ python migrate.py
 "years": [2000, 2019]
 ```
 ```bash
-python migrate.py
+python export.py
 ```
 とすればスタッフブログの2000年1月~2019年12月を走査し、記事をエクスポートできます。
 
