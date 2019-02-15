@@ -115,13 +115,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
-# project specific
-pyvenv.cfg
-lib64
-*.mt.txt
-.vscode
-share
-etc
-tmp.py
-include
