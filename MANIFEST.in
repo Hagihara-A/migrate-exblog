@@ -1,0 +1,2 @@
+recursive-include migrate *.json
+include LICENSE
