@@ -1,2 +1,3 @@
 include LICENSE
-include *.json
+recursive-include *.json
+recursive-include migrate_exblog *.txt

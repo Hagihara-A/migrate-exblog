@@ -2,8 +2,8 @@ import json
 from pathlib import Path
 from pprint import pprint
 
-from migrate.entries_to_mt import ConstructMTtext
-from migrate.scrape_exblog import ScrapeExblog
+from .entries_to_mt import ConstructMTtext
+from .scrape_exblog import ScrapeExblog
 
 ABS_PATH = Path(__file__).resolve()
 ABS_DIR = ABS_PATH.parent
@@ -24,12 +24,6 @@ def make_scraper(data):
         scraper.years = test_year
         scraper.exclude_func = lambda y, m: y == test_year and m == test_month
     return scraper
-
-
-def data_wrapper(data, **kwargs):
-    """for debug"""
-    for i, v in kwargs.items():
-        data[i] = v
 
 
 def main():

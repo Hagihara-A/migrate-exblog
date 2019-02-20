@@ -3,22 +3,12 @@ import types
 import urllib.parse as up
 from datetime import datetime
 from pathlib import Path
-from time import sleep
 
-import requests
-from bs4 import BeautifulSoup, Comment
+
+from bs4 import Comment
 from tqdm import tqdm
 
-
-def get(*args, interval=0.25, **kwargs):
-    sleep(interval)
-    return requests.get(*args, **kwargs)
-
-
-def get_soup(*args, **kwargs):
-    res = get(*args, **kwargs)
-    res.encoding = res.apparent_encoding
-    return BeautifulSoup(res.content, 'lxml')
+from .utils import get_soup
 
 
 class ScrapeExblog:
