@@ -6,10 +6,8 @@ ABS_DIR = ABS_PATH.parent
 
 class ConstructMTtext:
     def __init__(self,
-                 output_path=ABS_DIR.parent / 'migrate.mt.txt',
-                 mtTemplatePath=ABS_DIR / 'mt_template.txt'):
-        path = self.validate_path(mtTemplatePath)
-        self.output_path = self.validate_path(output_path)
+                 mt_template_path=ABS_DIR / 'mt_template.txt'):
+        path = self.validate_path(mt_template_path)
         with path.open('r') as f:
             self.MTtemplate = f.read()
 
@@ -34,7 +32,3 @@ class ConstructMTtext:
             MTfield += '-' * 8 + '\n'
 
         return MTfield
-
-    def save(self, text):
-        with self.output_path.open('w') as f:
-            f.write(text)
