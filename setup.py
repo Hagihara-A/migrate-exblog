@@ -4,7 +4,7 @@ with open('README.md', 'r') as f:
     long_descripton = f.read()
 
 setup(
-    name='migrate-excite-blog',
+    name='migrate-exblog',
     version='1.0.0',
     packages=find_packages(),
     long_descripton=long_descripton,
@@ -13,6 +13,11 @@ setup(
     install_requires=[
         'requests',
         'beautifulsoup4',
-        'tqdm'
+        'tqdm',
+        'lxml'
     ],
+    entry_points='''
+        [console_scripts]
+        migrate_exblog = migrate_exblog.cli:main
+    '''
 )

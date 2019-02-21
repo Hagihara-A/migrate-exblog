@@ -1,7 +1,4 @@
-from time import sleep
-
-import requests
-from bs4 import BeautifulSoup
+from .scrape_exblog import ScrapeExblog
 
 
 def data_wrapper(data, **kwargs):
@@ -10,8 +7,18 @@ def data_wrapper(data, **kwargs):
         data[i] = v
 
 
-def get_soup(url, interval=0.25):
-    res = requests.get(url)
-    sleep(interval)
-    res.encoding = res.apparent_encoding
-    return BeautifulSoup(res.content, 'lxml')
+def make_scraper(data):
+    scraper = ScrapeExblog(
+        url=data['url'],
+        years=data['years'],
+        selector_post=data['selector_post'],
+        selector_title=data['selector_title'],
+        selector_body=data['selector_body'],
+        selector_foot=data['selector_foot']
+    )
+    if data['is_test']:
+        test_year = data['test_year']
+        test_month = data['test_month']
+        scraper.years = test_year
+        scraper.exclude_func = lambda y, m: y == test_year and m == test_month
+    return scraper

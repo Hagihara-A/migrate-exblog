@@ -3,7 +3,6 @@
 ## 概要
 エキサイトブログにはエクスポート機能がないのでスクレイピングしてmovable type(MT)形式で出力します。(FC2を使ってもエクスポートは可能です。)
 現在、タイトル・本文・投稿日時のエクスポートには対応していますが、コメント・カテゴリ・その他の要素については対応していません。
-
 ## 使い方
 ```bash
 git clone https://github.com/Hagihara-A/scrape-excite-blog.git
@@ -42,6 +41,13 @@ cd scrape-excite-blog
 python export.py
 ```
 でエクスポートを実行できます。migrate.mt.txtというファイルに出力されます。
+## cliの使い方
+``migrate_exblog --json-template <path>`` でスクレイピングに必要な設定のテンプレートをpathに出力します。デフォルトでは ``./input.json`` が作られます。
+
+``migrate_exblog scrape``でデフォルトの設定を使って、スクレイピングを開始します。scrapeサブコマンドはいくつかのオプションをとります。
+* ``--input-path <path>`` pathにあるjsonファイルを読み込んでスクレイピングを開始します。デフォルトは``./input.json``です
+* ``--output-path <path>`` pathに結果を出力します。デフォルトでは``./migrate.mt.txt``に出力されます。　
+
 ## デモ
 ```bash
 git clone https://github.com/Hagihara-A/scrape-excite-blog.git
