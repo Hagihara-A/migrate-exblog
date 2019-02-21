@@ -5,7 +5,7 @@
 現在、タイトル・本文・投稿日時のエクスポートには対応していますが、コメント・カテゴリ・その他の要素については対応していません。
 ## クイックスタート
 ```bash
-pip install git+git@github.com:Hagihara-A/migrate-exblog
+pip install git+https://github.com/Hagihara-A/migrate-exblog
 migrate-exblog make-conf
 migrate-exblog migrate
 ```
@@ -83,7 +83,7 @@ optional arguments:
 
 ## デモ
 ```bash
-pip install git+git@github.com:Hagihara-A/migrate-exblog
+pip install git+https://github.com/Hagihara-A/migrate-exblog
 migate-exblog make-conf
 migrate-exblog migrate
 ```
