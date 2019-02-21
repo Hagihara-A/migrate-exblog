@@ -7,7 +7,9 @@ from .entries_to_mt import ConstructMTtext
 from .utils import make_scraper
 
 ABS_DIR = Path(__file__).parent
-DEFAULT_JSON_PATH = ABS_DIR / 'input.json'
+CONF_PATH = './migrate-conf.json'
+DEFAULT_CONF_PATH = ABS_DIR / CONF_PATH
+OUTPUT_PATH = './migrate.mt.txt'
 
 
 def parse():
@@ -16,16 +18,19 @@ def parse():
 
     subparsers = parser.add_subparsers()
 
-    parser_template = subparsers.add_parser('json-template')
-    parser_template.add_argument('--json-template-path',
-                                 default='./input.json', type=ap.FileType('w'))
-    parser_template.set_defaults(func=output_json_template)
+    parser_conf = subparsers.add_parser(
+        'make-conf', description=f'<--config-file-path>に設定ファイルを作成します.デフォルトは{CONF_PATH}です.')
+    parser_conf.add_argument('--config-file-path',
+                             default=CONF_PATH, type=ap.FileType('w'),
+                             help="設定ファイルのパスを指定してください.")
+    parser_conf.set_defaults(func=output_json_template)
 
-    parser_migrate = subparsers.add_parser('migrate')
+    parser_migrate = subparsers.add_parser(
+        'migrate', description='ブログを出力します.')
     parser_migrate.add_argument(
-        '--input-path', default='./input.json', type=ap.FileType('r'))
+        '--conf-path', default=CONF_PATH, type=ap.FileType('r'), help=f'設定ファイルのパスを指定してください.デフォルトでは{CONF_PATH}です.')
     parser_migrate.add_argument(
-        '--output-path', default='./migrate.mt.txt', type=ap.FileType('w'))
+        '--output-path', default=OUTPUT_PATH, type=ap.FileType('w'), help=f'出力ファイルのパスを指定してください。デフォルトでは{OUTPUT_PATH}です.')
     parser_migrate.set_defaults(func=migrate)
 
     def print_help(args):
@@ -37,13 +42,13 @@ def parse():
 
 
 def output_json_template(args):
-    with DEFAULT_JSON_PATH.open('rt') as f:
+    with DEFAULT_CONF_PATH.open('rt') as f:
         default_json = f.read()
-    args.json_template_path.write(default_json)
+    args.config_file_path.write(default_json)
 
 
 def migrate(args):
-    data = json.load(args.input_path)
+    data = json.load(args.conf_path)
     print('your input data is as follows:')
     pprint(data)
     input('OK? press any key.')

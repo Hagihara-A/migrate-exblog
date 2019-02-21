@@ -18,6 +18,6 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        migrate_exblog = migrate_exblog.cli:main
+        migrate-exblog = migrate_exblog.cli:main
     '''
 )
