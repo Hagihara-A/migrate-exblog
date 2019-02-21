@@ -109,7 +109,7 @@ class ScrapeExblog:
 
     def if_indv_url(self, url):
         url = up.urlparse(url)
-        if url.netloc == self.url.netloc and re.search(r'\d{9}', url.path):
+        if (url.netloc == self.url.netloc) and re.search(r'^/\d*/$', url.path):
             return True
         else:
             return False
