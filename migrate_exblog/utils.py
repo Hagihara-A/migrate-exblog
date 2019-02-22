@@ -11,10 +11,8 @@ def make_scraper(data):
     scraper = ScrapeExblog(
         url=data['url'],
         years=data['years'],
-        selector_post=data['selector_post'],
         selector_title=data['selector_title'],
         selector_body=data['selector_body'],
-        selector_foot=data['selector_foot']
     )
     if data['is_test']:
         test_year = data['test_year']

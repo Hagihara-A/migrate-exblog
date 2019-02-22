@@ -11,7 +11,7 @@ from bs4 import Comment
 from tqdm import tqdm
 
 
-def get_soup(url, interval=0.25):
+def get_soup(url, interval=0.20):
     res = requests.get(url)
     sleep(interval)
     res.encoding = res.apparent_encoding
@@ -22,17 +22,15 @@ class ScrapeExblog:
     def __init__(self,
                  url,
                  years,
-                 selector_post,
                  selector_title,
                  selector_body,
-                 selector_foot,
+                 selector_post='.post',
                  selector_time='.TIME'):
         self.url = self.validate_url(url)
         self.years = years
         self.selector_post = self.validate_selector(selector_post)
         self.selector_title = self.validate_selector(selector_title)
         self.selector_body = self.validate_selector(selector_body)
-        self.selector_foot = self.validate_selector(selector_foot)
         self.selector_time = self.validate_selector(selector_time)
 
         self.exclude_func = lambda *x: True
@@ -64,7 +62,7 @@ class ScrapeExblog:
 
     def parse_title(self, post):
         ttl = post.select_one(self.selector_title)
-        return ttl.get_text().strip()
+        return ttl.get_text(strip=True)
 
     def parse_body(self, post):
         body = post.select_one(self.selector_body)
@@ -75,12 +73,13 @@ class ScrapeExblog:
             text=lambda x: isinstance(x, Comment))]
         return body.prettify()
 
-    def parse_date(self, soup):
-        footer = soup.select_one(self.selector_foot)
-        time = footer.select_one('.TIME')
-        anchor = time.find('a', text=re.compile(r'^\d{4}-\d{1,2}-\d{1,2}'))
-        time = anchor.get_text()
-        return datetime.strptime(time, '%Y-%m-%d %H:%M')
+    def parse_date(self, post):
+        reg_pat = r'^\d{4}-\d{1,2}-\d{1,2}'
+        times = post.select(self.selector_time + ' a')
+        for time in times:
+            time_str = time.get_text()
+            if re.search(reg_pat, time_str):
+                return datetime.strptime(time_str, '%Y-%m-%d %H:%M')
 
     def make_month_archive_url(self, y, m):
         anchive_url = datetime(y, m, 1)
@@ -128,8 +127,7 @@ class ScrapeExblog:
         return list(entries)
 
     def parse_indv_page(self, indv_url):
-        soup = get_soup(indv_url)
-        post = soup.select_one(self.selector_post)
+        post = get_soup(indv_url)
         entry = {
             'title': self.parse_title(post),
             'body': self.parse_body(post),

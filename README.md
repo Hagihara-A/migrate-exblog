@@ -31,20 +31,16 @@ migrate-exblog make-conf
     ],
     "test_year": 2018,
     "test_month": 12,
-    "selector_post": ".post",
     "selector_title": ".post-title",
-    "selector_body": ".post-main",
-    "selector_foot": ".post-tail"
+    "selector_body": ".post-main"
 }
 ```
 
-- is_test: Trueにした場合、特定の月のみを出力することで動作確認が出来ます。この時引数test_yearとtest_monthの値が使われます。yearsは無視されます。Falseにした場合、yearsで指定した範囲の記事を全て出力します。また、この時test_yearとtest_monthは無視されます。
+- is_test: trueにした場合、特定の月のみを出力することで動作確認が出来ます。この時引数test_yearとtest_monthの値が使われます。yearsは無視されます。falseにした場合、yearsで指定した範囲の記事を全て出力します。また、この時test_yearとtest_monthは無視されます。
 - years: ある年だけを出力したい場合は"years": [2018, 2018]、もしくは単純に"years": 2018としてください。
 - url: 出力したいブログのURLを入力してください
-- selector_post: タイトル・本文・投稿日時を全て含むCSSセレクタを指定します。
 - selector_title: タイトルを含むdivのクラスをCSSセレクタ形式で指定します。
 - selector_body: 本文を含むdivのクラスをCSSセレクタ形式で指定します。
-- selector_foot: 投稿日時を含むdivのクラスをCSSセレクタ形式で指定します。フッタ−はTIMEクラスを含むdivの親要素です。
 
 セレクタ−の指定は間違えやすいと思うのでデフォルトの値を参考にしてみてください。
 
