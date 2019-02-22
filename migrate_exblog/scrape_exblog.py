@@ -24,11 +24,9 @@ class ScrapeExblog:
                  years,
                  selector_title,
                  selector_body,
-                 selector_post='.post',
                  selector_time='.TIME'):
         self.url = self.validate_url(url)
         self.years = years
-        self.selector_post = self.validate_selector(selector_post)
         self.selector_title = self.validate_selector(selector_title)
         self.selector_body = self.validate_selector(selector_body)
         self.selector_time = self.validate_selector(selector_time)
