@@ -21,12 +21,12 @@ def get_soup(url, interval=0.20):
 class ScrapeExblog:
     def __init__(self,
                  url,
-                 years,
+                 date_dict,
                  selector_title,
                  selector_body,
                  selector_time='.TIME'):
         self.url = self.validate_url(url)
-        self.years = years
+        self.date_dict = date_dict
         self.selector_title = self.validate_selector(selector_title)
         self.selector_body = self.validate_selector(selector_body)
         self.selector_time = self.validate_selector(selector_time)
@@ -112,10 +112,9 @@ class ScrapeExblog:
             return False
 
     def date_iter(self):
-        for year in range(self.years[0], self.years[1] + 1):
-            for month in range(1, 13):
-                if self.exclude_func(year, month):
-                    yield (year, month)
+        for year, month_list in self.date_dict.items():
+            for month in month_list:
+                yield (year, month)
 
     def scrape(self):
         entries = []
@@ -139,26 +138,3 @@ class ScrapeExblog:
             lambda y_m: self.make_month_archive_url(*y_m), dates)
         return self.get_indv_url_from_month_archive_urls(archive_urls)
 
-    @property
-    def years(self):
-        return self._years
-
-    @years.setter
-    def years(self, years):
-        if isinstance(years, int):
-            self._years = (years, years)
-        elif isinstance(years, (tuple, list)) and len(years) == 2:
-            self._years = years
-        else:
-            raise TypeError('years must be int or list or tuple(len==2)')
-
-    @property
-    def exclude_func(self):
-        return self._exclude_func
-
-    @exclude_func.setter
-    def exclude_func(self, func):
-        if isinstance(func, types.FunctionType):
-            self._exclude_func = func
-        else:
-            raise TypeError('exclude_func must be function')
