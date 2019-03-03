@@ -1,5 +1,4 @@
 import re
-import types
 import urllib.parse as up
 from datetime import datetime
 from pathlib import Path
@@ -31,7 +30,6 @@ class ScrapeExblog:
         self.selector_body = self.validate_selector(selector_body)
         self.selector_time = self.validate_selector(selector_time)
 
-        self.exclude_func = lambda *x: True
         self.entries = []
 
     def validate_url(self, url):
@@ -137,4 +135,3 @@ class ScrapeExblog:
         archive_urls = map(
             lambda y_m: self.make_month_archive_url(*y_m), dates)
         return self.get_indv_url_from_month_archive_urls(archive_urls)
-
