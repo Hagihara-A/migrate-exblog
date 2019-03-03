@@ -19,7 +19,7 @@ class ParseRange:
                 range_dic[year] = month_list
             elif mult_match:
                 y1, y2 = self.pick_years(mult_match)
-                for y in range(y1, y2+1):
+                for y in range(y1, y2 + 1):
                     range_dic[y] = month_list
         return range_dic
 
