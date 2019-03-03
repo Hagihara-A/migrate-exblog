@@ -1,5 +1,7 @@
-from .scrape_exblog import ScrapeExblog
 import re
+
+from .entries_to_mt import ConstructMTtext
+from .scrape_exblog import ScrapeExblog
 
 
 class ParseRange:
@@ -58,3 +60,11 @@ def make_scraper(conf):
         selector_body=conf['selector_body'],
     )
     return scraper
+
+
+def bake(conf):
+    scraper = make_scraper(conf)
+    entries = scraper.scrape()
+    mtparser = ConstructMTtext()
+    mttext = mtparser.make_mttext(entries)
+    return mttext

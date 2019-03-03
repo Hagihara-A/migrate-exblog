@@ -3,8 +3,7 @@ import json
 from pathlib import Path
 from pprint import pprint
 
-from .entries_to_mt import ConstructMTtext
-from .utils import make_scraper
+from .utils import bake
 
 ABS_DIR = Path(__file__).parent
 CONF_PATH = './migrate-conf.json'
@@ -41,21 +40,26 @@ def parse():
     return parser.parse_args()
 
 
+def load_default_json(path=DEFAULT_CONF_PATH, jsonize=True):
+    with path.open('r') as f:
+        if jsonize:
+            return json.load(f)
+        else:
+            return f
+
+
 def output_json_template(args):
-    with DEFAULT_CONF_PATH.open('rt') as f:
-        default_json = f.read()
+    default_json = load_default_json(jsonize=False).read()
     args.config_file_path.write(default_json)
 
 
-def migrate(args):
-    data = json.load(args.conf_path)
-    print('your input data is as follows:')
-    pprint(data)
-    input('OK? press any key.')
-    scraper = make_scraper(data)
-    entries = scraper.scrape()
-    mtparser = ConstructMTtext()
-    mttext = mtparser.make_mttext(entries)
+def migrate(args, confirm=True):
+    conf = json.load(args.conf_path)
+    if confirm:
+        print('your input data is as follows:')
+        pprint(conf)
+        input('OK? press any key.')
+    mttext = bake(conf)
     args.output_path.write(mttext)
 
 
