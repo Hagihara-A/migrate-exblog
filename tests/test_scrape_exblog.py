@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from unittest import TestCase
 
-from migrate_exblog.utils import make_scraper
+from export import make_scraper
 
 ABS_PATH = Path(__file__).resolve()
 ABS_DIR = ABS_PATH.parent

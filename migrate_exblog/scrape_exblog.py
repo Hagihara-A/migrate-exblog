@@ -10,7 +10,7 @@ from bs4 import Comment
 from tqdm import tqdm
 
 
-def get_soup(url, interval=0.25):
+def get_soup(url, interval=0.20):
     res = requests.get(url)
     sleep(interval)
     res.encoding = res.apparent_encoding

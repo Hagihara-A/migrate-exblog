@@ -1,10 +1,14 @@
 {
+    "is_test": true,
     "url": "https://staff.exblog.jp/",
-    "date": {
-        "2018": [
-            12
-        ]
-    },
+    "years": [
+        2018,
+        2019
+    ],
+    "test_year": 2018,
+    "test_month": 12,
+    "selector_post": ".post",
     "selector_title": ".post-title",
-    "selector_body": ".post-main"
+    "selector_body": ".post-main",
+    "selector_foot": ".post-tail"
 }
