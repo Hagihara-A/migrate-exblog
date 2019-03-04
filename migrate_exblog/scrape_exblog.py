@@ -9,11 +9,11 @@ from bs4 import Comment
 from tqdm import tqdm
 
 
-def get_soup(url, interval=0.20):
+def get_soup(url, interval=0.5):
     res = requests.get(url)
     sleep(interval)
     res.encoding = res.apparent_encoding
-    return BeautifulSoup(res.content, 'lxml')
+    return BeautifulSoup(res.content, 'html.parser')
 
 
 class ScrapeExblog:
@@ -31,6 +31,8 @@ class ScrapeExblog:
         self.selector_tail = self.class_to_selector(class_tail)
         self.selector_time = self.class_to_selector(class_time)
 
+        self.date_pat = re.compile(r'^\d{4}-\d{1,2}-\d{1,2}')
+        self.tag_path_pat = re.compile(r'/i\d+/')
         self.entries = []
 
     def validate_url(self, url):
@@ -45,8 +47,81 @@ class ScrapeExblog:
     def class_to_selector(self, class_):
         if class_.startswith('.'):
             return class_
+        elif class_ is None:
+            return class_
         else:
             return '.' + class_
+
+    def scrape_one_month(self):
+        entries = []
+        month_archive_url = self.get_month_archive_urls()[0]
+        indv_urls = self.get_indv_url_from_month_archive_urls(
+            [month_archive_url])
+        for i_url in indv_urls:
+            entries.append(self.parse_indv_page(i_url))
+        return entries
+
+    def scrape_all(self, verbose=False):
+        entries = []
+        indv_urls = self.get_indv_urls()
+        if verbose:
+            indv_urls = tqdm(indv_urls)
+        for i_url in indv_urls:
+            entries.append(self.parse_indv_page(i_url))
+        return entries
+
+    def get_indv_urls(self):
+        month_archive_urls = self.get_month_archive_urls()
+        return self.get_indv_url_from_month_archive_urls(month_archive_urls)
+
+    def get_month_archive_urls(self):
+        month_archive_urls = []
+        archive_url = up.urljoin(self.url.geturl(), 'm1900-01-01/')
+        soup = get_soup(archive_url)
+        archive_soup = soup.select_one('.ARCHIVE_BODY')
+        for a in archive_soup.find_all('a'):
+            href = a.get('href')
+            if href:
+                month_archive_urls.append(up.urljoin(self.url.geturl(), href))
+        return month_archive_urls
+
+    def get_indv_url_from_month_archive_urls(self, archive_urls):
+        indv_urls = []
+        for arc_url in archive_urls:
+            soup = get_soup(arc_url)
+            indv_urls.extend(self.extruct_indv_urls_from_archive_soup(soup))
+        return indv_urls
+
+    def extruct_indv_urls_from_archive_soup(self, soup):
+        indv_urls = []
+        archive_list = soup.select_one('.archivelist')
+
+        for a in archive_list.find_all('a'):
+            href = a.get('href')
+            if self.if_indv_url(href):
+                indv_urls.append(href)
+        return indv_urls
+
+    def if_indv_url(self, url):
+        url = up.urlparse(url)
+        if (url.netloc == self.url.netloc) and re.search(r'^/\d*/$', url.path):
+            return True
+        else:
+            return False
+
+    def parse_indv_page(self, indv_url):
+        post = get_soup(indv_url)
+        if self.selector_post:
+            post = post.select_one(self.selector_post)
+        post_time = post.select_one(
+            self.selector_tail + ' ' + self.selector_time)
+        entry = {
+            'title': self.parse_title(post),
+            'body': self.parse_body(post),
+            'date': self.parse_date(post_time),
+            'category': self.parse_category(post_time)
+        }
+        return entry
 
     def parse_title(self, post):
         ttl = post.select_one(self.selector_title)
@@ -61,62 +136,14 @@ class ScrapeExblog:
             text=lambda x: isinstance(x, Comment))]
         return body.prettify()
 
-    def parse_date(self, post):
-        reg_pat = r'^\d{4}-\d{1,2}-\d{1,2}'
-        times = post.select(self.selector_time + ' a')
-        for time in times:
-            time_str = time.get_text()
-            if re.search(reg_pat, time_str):
-                return datetime.strptime(time_str, '%Y-%m-%d %H:%M')
+    def parse_date(self, post_time):
+        for a in post_time.find_all('a'):
+            text = a.get_text()
+            if self.date_pat.match(text):
+                return datetime.strptime(text, '%Y-%m-%d %H:%M')
 
-    def parse_category(self, post):
-        pass
-
-    def get_indv_url_from_month_archive_urls(self, archive_urls):
-        indv_urls = []
-        for arc_url in archive_urls:
-            soup = get_soup(arc_url)
-            indv_urls.extend(self.extruct_indv_urls_from_archive_soup(soup))
-        return indv_urls
-
-    def extruct_indv_urls_from_archive_soup(self, soup):
-        indv_urls = []
-        titles = soup.select(self.selector_title)
-
-        for title in titles:
-            try:
-                url = title.a.get('href')
-                if self.if_indv_url(url):
-                    indv_urls.append(url)
-            except AttributeError:
-                continue
-        return indv_urls
-
-    def if_indv_url(self, url):
-        url = up.urlparse(url)
-        if (url.netloc == self.url.netloc) and re.search(r'^/\d*/$', url.path):
-            return True
-        else:
-            return False
-
-    def scrape(self, verbose=False):
-        entries = []
-        indv_urls = self.get_indv_urls()
-        if verbose:
-            indv_urls = tqdm(indv_urls)
-        for i_url in indv_urls:
-            entries.append(self.parse_indv_page(i_url))
-        return entries
-
-    def parse_indv_page(self, indv_url):
-        post = get_soup(indv_url)
-        entry = {
-            'title': self.parse_title(post),
-            'body': self.parse_body(post),
-            'date': self.parse_date(post),
-            'category': self.parse_category(post)
-        }
-        return entry
-
-    def get_indv_urls(self):
-        pass
+    def parse_category(self, post_time):
+        for a in post_time.find_all('a'):
+            url = up.urlparse(a.get('href'))
+            if self.tag_path_pat.match(url.path):
+                return a.get_text()

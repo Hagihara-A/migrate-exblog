@@ -14,7 +14,6 @@ setup(
         'requests',
         'beautifulsoup4',
         'tqdm',
-        'lxml'
     ],
     entry_points='''
         [console_scripts]
