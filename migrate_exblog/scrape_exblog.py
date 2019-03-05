@@ -65,7 +65,6 @@ class ScrapeExblog:
 
     self.date_pat = re.compile(r'^\d{4}-\d{1,2}-\d{1,2}')
     self.tag_path_pat = re.compile(r'/i\d+/')
-    self.entries = []
 
     def validate_url(self, url):
         if isinstance(url, str):
