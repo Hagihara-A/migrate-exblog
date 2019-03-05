@@ -1,66 +1,63 @@
 import argparse as ap
 import json
+import os
 from pathlib import Path
-from pprint import pprint
 
-from .utils import bake
+from .utils import bake, bake_from_class_dict
 
 ABS_DIR = Path(__file__).parent
-CONF_PATH = './migrate-conf.json'
+CONF_PATH = 'conf.json'
 DEFAULT_CONF_PATH = ABS_DIR / CONF_PATH
-OUTPUT_PATH = './migrate.mt.txt'
+OUTPUT_PATH = 'migrate.mt.txt'
 
 
 def parse():
+    parser = ap.ArgumentParser(fromfile_prefix_chars='@')
+    parser.add_argument('-u', '--url')
 
-    parser = ap.ArgumentParser()
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('-s', '--structure',
+                       default='structure.html')
+    group.add_argument('-j', '--structure-json',
+                       default=CONF_PATH)
+
+    parser.add_argument(
+        '-o', '--output', default=f'{OUTPUT_PATH}', type=ap.FileType('w'))
+    parser.add_argument('-t', '--test', action='store_true')
+    parser.add_argument('-v', '--verbose', action='store_true')
+    parser.set_defaults(func=migrate)
 
     subparsers = parser.add_subparsers()
-
-    parser_conf = subparsers.add_parser(
-        'make-conf', description=f'<--config-file-path>に設定ファイルを作成します.デフォルトは{CONF_PATH}です.')
-    parser_conf.add_argument('--config-file-path',
-                             default=CONF_PATH, type=ap.FileType('w'),
-                             help="設定ファイルのパスを指定してください.")
-    parser_conf.set_defaults(func=output_json_template)
-
-    parser_migrate = subparsers.add_parser(
-        'migrate', description='ブログを出力します.')
-    parser_migrate.add_argument(
-        '--conf-path', default=CONF_PATH, type=ap.FileType('r'), help=f'設定ファイルのパスを指定してください.デフォルトでは{CONF_PATH}です.')
-    parser_migrate.add_argument(
-        '--output-path', default=OUTPUT_PATH, type=ap.FileType('w'), help=f'出力ファイルのパスを指定してください。デフォルトでは{OUTPUT_PATH}です.')
-    parser_migrate.set_defaults(func=migrate)
-
-    def print_help(args):
-        parser.print_help()
-
-    parser.set_defaults(func=print_help)
+    parser_conf = subparsers.add_parser('make-conf')
+    parser_conf.add_argument(
+        '-o', '--output', default=f'{CONF_PATH}', type=ap.FileType('w'))
+    parser_conf.set_defaults(func=output_conf)
 
     return parser.parse_args()
 
 
-def load_default_json(path=DEFAULT_CONF_PATH, jsonize=True):
-    with path.open('r') as f:
-        if jsonize:
-            return json.load(f)
-        else:
-            return f
+def output_conf(args):
+    with DEFAULT_CONF_PATH.open('r') as f:
+        args.output.write(f.read())
 
 
-def output_json_template(args):
-    default_json = load_default_json(jsonize=False).read()
-    args.config_file_path.write(default_json)
+def migrate(args):
+    cwd = os.getcwd()
+    structure = os.path.join(cwd, args.structure)
+    structure_json = os.path.join(cwd, args.structure_json)
+    if os.path.exists(structure):
+        with open(structure, 'r') as f:
+            mttext = bake(url=args.url, structure_html=f.read(),
+                          one_month=args.test, verbose=args.verbose)
+    elif os.path.exists(structure_json):
+        with open(structure_json, 'r') as f:
+            class_dict = json.load(f)
+            mttext = bake_from_class_dict(
+                url=args.url, class_dict=class_dict, one_month=args.test, verbose=args.verbose)
+    else:
+        raise FileExistsError('no configure file exists')
 
-
-def migrate(args, confirm=True):
-    conf = json.load(args.conf_path)
-    if confirm:
-        print('your input data is as follows:')
-        pprint(conf)
-        input('OK? press any key.')
-    mttext = bake(conf)
-    args.output_path.write(mttext)
+    args.output.write(mttext)
 
 
 def main():

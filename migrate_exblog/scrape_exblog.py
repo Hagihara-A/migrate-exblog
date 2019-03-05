@@ -18,13 +18,11 @@ def get_soup(url, interval=0.5):
 class ScrapeExblog:
     def __init__(self,
                  url,
-                 class_post,
                  class_title,
                  class_body,
                  class_tail,
                  class_time='TIME'):
         self.url = self.validate_url(url)
-        self.selector_post = self.class_to_selector(class_post)
         self.selector_title = self.class_to_selector(class_title)
         self.selector_body = self.class_to_selector(class_body)
         self.selector_tail = self.class_to_selector(class_tail)
@@ -51,11 +49,13 @@ class ScrapeExblog:
         else:
             return '.' + class_
 
-    def scrape_one_month(self):
+    def scrape_one_month(self, verbose=False):
         entries = []
         month_archive_url = self.get_month_archive_urls()[0]
         indv_urls = self.get_indv_url_from_month_archive_urls(
             [month_archive_url])
+        if verbose:
+            indv_urls = tqdm(indv_urls)
         for i_url in indv_urls:
             entries.append(self.parse_indv_page(i_url))
         return entries
@@ -110,8 +110,6 @@ class ScrapeExblog:
 
     def parse_indv_page(self, indv_url):
         post = get_soup(indv_url)
-        if self.selector_post:
-            post = post.select_one(self.selector_post)
         post_time = post.select_one(
             self.selector_tail + ' ' + self.selector_time)
         entry = {
