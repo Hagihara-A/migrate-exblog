@@ -9,6 +9,17 @@ from tqdm import tqdm
 
 
 def get_soup(url, interval=0.5):
+    """get soup of html in url and sleep
+
+    Arguments:
+        url {str} -- url to get soup
+
+    Keyword Arguments:
+        interval {float} -- interval to sleep (default: {0.5})
+
+    Returns:
+        BeautifulSoup -- BeautifulSoup object that parses html in url
+    """
     res = requests.get(url)
     sleep(interval)
     res.encoding = res.apparent_encoding
@@ -16,27 +27,49 @@ def get_soup(url, interval=0.5):
 
 
 class ScrapeExblog:
+    """scrape and parse exblog entries
+
+    Raises:
+        TypeError -- if url is not str
+
+    Attributes:
+        scrape_all: scrape all entries and returns parsed ones
+        scrape_one_month: scrape entries posted during one month
+    """
+
     def __init__(self,
                  url,
                  class_title,
                  class_body,
                  class_tail,
                  class_time='TIME'):
-        self.url = self.validate_url(url)
-        self.selector_title = self.class_to_selector(class_title)
-        self.selector_body = self.class_to_selector(class_body)
-        self.selector_tail = self.class_to_selector(class_tail)
-        self.selector_time = self.class_to_selector(class_time)
+    """
+    Arguments:
+        url {str} -- url to scrape and parse
+        class_title {str} -- parent class of title
+        class_body {str} -- parent class of body
+        class_tail {str} -- parent class of footer
 
-        self.date_pat = re.compile(r'^\d{4}-\d{1,2}-\d{1,2}')
-        self.tag_path_pat = re.compile(r'/i\d+/')
-        self.entries = []
+    Keyword Arguments:
+        class_time {str} -- footer's class placed in inner of class_tail. This is auto genereted by exblog (default: {'TIME'})
+
+    Raises:
+        TypeError -- if url is not str
+    """
+
+    self.url = self.validate_url(url)
+    self.selector_title = self.class_to_selector(class_title)
+    self.selector_body = self.class_to_selector(class_body)
+    self.selector_tail = self.class_to_selector(class_tail)
+    self.selector_time = self.class_to_selector(class_time)
+
+    self.date_pat = re.compile(r'^\d{4}-\d{1,2}-\d{1,2}')
+    self.tag_path_pat = re.compile(r'/i\d+/')
+    self.entries = []
 
     def validate_url(self, url):
         if isinstance(url, str):
             return up.urlparse(url)
-        elif isinstance(url, up.ParseResult):
-            return url
         else:
             raise TypeError(
                 'url must be "str" or "urllib.parse.ParseResult" object')
@@ -50,6 +83,15 @@ class ScrapeExblog:
             return '.' + class_
 
     def scrape_one_month(self, verbose=False):
+        """scrape only one month. Probably recent month.
+
+        Keyword Arguments:
+            verbose {bool} -- show progress bar (default: {False})
+
+        Returns:
+            dict -- dict of parsed entries.Keys are 'title', 'body', 'date' and 'category'
+        """
+
         entries = []
         month_archive_url = self.get_month_archive_urls()[0]
         indv_urls = self.get_indv_url_from_month_archive_urls(
@@ -61,6 +103,15 @@ class ScrapeExblog:
         return entries
 
     def scrape_all(self, verbose=False):
+        """scrape all entries
+
+        Keyword Arguments:
+            verbose {bool} -- show progress bar (default: {False})
+
+        Returns:
+            dict -- dict of parsed entries.Keys are 'title', 'body', 'date' and 'category'
+        """
+
         entries = []
         indv_urls = self.get_indv_urls()
         if verbose:
@@ -74,6 +125,14 @@ class ScrapeExblog:
         return self.get_indv_url_from_month_archive_urls(month_archive_urls)
 
     def get_month_archive_urls(self):
+        """get archive urls to get indidual urls.
+        Note:
+            all archive urls is listed on `self.url + '/m1900-01-01'`. what a poor url...
+
+        Returns:
+            list of str -- archive urls
+        """
+
         month_archive_urls = []
         archive_url = up.urljoin(self.url.geturl(), 'm1900-01-01/')
         soup = get_soup(archive_url)
@@ -102,6 +161,17 @@ class ScrapeExblog:
         return indv_urls
 
     def if_indv_url(self, url):
+        """judgbe whether url in individual url or not
+
+        Note:
+            individual url's path is sequence of int
+
+        Arguments:
+            url {str} -- url to judge
+
+        Returns:
+            bool -- True if individual url
+        """
         url = up.urlparse(url)
         if (url.netloc == self.url.netloc) and re.search(r'^/\d*/$', url.path):
             return True
@@ -126,6 +196,7 @@ class ScrapeExblog:
 
     def parse_body(self, post):
         body = post.select_one(self.selector_body)
+        # remove unnecessary divs
         divs = body.find_all(
             class_=['sm_icon_mini', 'ad-yads_common', 'bbs_preview', 'exblog_cpc', 'clear'])
         [div.decompose() for div in divs]
