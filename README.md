@@ -13,7 +13,7 @@ migrate-exblog --url=<url>
 ## 使い方
 基本的には以下の様に使います
 ```bash
-$ migrate-exblog --url=<url> --structure=<structure-html-path>
+$ migrate-exblog --url=<url
 ```
 ヘルプは以下です。
 ```bash
@@ -56,7 +56,7 @@ optional arguments:
 ## 構造htmlがわからない場合
 パスワードを忘れたなどの理由で構造htmlがわからない場合、タイトル・本文・フッタ−のクラスを直接指定してエクスポートできます。
 
-``migrate-exblog make-conf``とすることで＠カレントディレクトリに``conf.json``というテンプレートが生成されます。
+``migrate-exblog make-conf``とすることでカレントディレクトリに``conf.json``というテンプレートが生成されます。
 
 テンプレートの内容は以下のようになっています
 ```json
@@ -82,11 +82,15 @@ conf.json  migrate.mt.txt
 
 ## ファイルから引数を読み込む
 ```bash
+$ migrate-exblog make-conf
 $ cat > args.txt
 --url=https://staff.exblog.jp/
 -v
 -t
+$ ls
+args.txt  conf.json
 $ migrate-exblog @args.txt
+args.txt  conf.json  migrate.mt.txt
 ```
 のようにファイル名の前に@をつけることでファイルから引数を読み込めます。詳しくは https://docs.python.org/ja/3/library/argparse.html#fromfile-prefix-chars をご覧ください。
 ## ライセンス
