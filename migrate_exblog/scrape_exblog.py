@@ -1,11 +1,10 @@
 import re
 import urllib.parse as up
 from datetime import datetime
-import requests
-from bs4 import BeautifulSoup
 from time import sleep
 
-from bs4 import Comment
+import requests
+from bs4 import BeautifulSoup, Comment
 from tqdm import tqdm
 
 
@@ -147,3 +146,4 @@ class ScrapeExblog:
             url = up.urlparse(a.get('href'))
             if self.tag_path_pat.match(url.path):
                 return a.get_text()
+        return ''

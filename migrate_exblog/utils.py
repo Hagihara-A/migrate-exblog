@@ -1,9 +1,9 @@
 import re
+
 from bs4 import BeautifulSoup
 
 from .entries_to_mt import ConstructMTtext
 from .scrape_exblog import ScrapeExblog
-
 
 PAT_TITLE = re.compile(r'<\$postsubject\$>')
 PAT_BODY = re.compile(r'<\$postcont\$>')
@@ -58,5 +58,3 @@ def get_tail_class(soup):
 
 def parent_class(soup, pattern):
     return soup.find(text=pattern).parent.get('class')[0]
-
-

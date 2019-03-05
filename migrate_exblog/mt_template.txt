@@ -1,7 +1,5 @@
 TITLE: {title}
 STATUS: Publish
-ALLOW COMMENTS: 1
-CONVERT BREAKS: 0
 DATE: {date}
 CATEGORY: {category}
 -----
