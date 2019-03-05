@@ -5,7 +5,7 @@ with open('README.md', 'r') as f:
 
 setup(
     name='migrate-exblog',
-    version='1.0.0',
+    version='1.0.1',
     packages=find_packages(),
     long_description=long_description,
     python_requires='>=3.4',
@@ -14,7 +14,6 @@ setup(
         'requests',
         'beautifulsoup4',
         'tqdm',
-        'lxml'
     ],
     entry_points='''
         [console_scripts]
