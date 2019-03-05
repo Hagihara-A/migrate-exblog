@@ -11,11 +11,39 @@ PAT_TAIL = re.compile(r'<\$posttail\$>')
 
 
 def bake(url, structure_html, one_month=False, verbose=False):
+    '''returns MT formatted entries
+
+    Arguments:
+        url {str} -- url to scrape
+        structure_html {str} -- html that represents structure of blog-post
+
+    Keyword Arguments:
+        one_month {bool} -- scrape only one month to test (default: {False})
+        verbose {bool} -- show progress bar (default: {False})
+
+    Returns:
+        str -- MT formatted entries
+    '''
+
     class_dict = get_correct_class(structure_html)
     return bake_from_class_dict(url=url, class_dict=class_dict, one_month=one_month, verbose=verbose)
 
 
 def bake_from_class_dict(url, class_dict, one_month=False, verbose=False):
+    '''bake func that recieves class_dict instead of structure_html
+
+    Arguments:
+        url {str} -- url to scrape
+        class_dict {dict of str} -- dict that express parent-class of title, content and footer
+
+    Keyword Arguments:
+        one_month {bool} -- scrape only one month to test (default: {False})
+        verbose {bool} -- show progress bar (default: {False})
+
+    Returns:
+        str -- MT formatted entries
+    '''
+
     scraper = ScrapeExblog(url=url, **class_dict)
     if one_month:
         entries = scraper.scrape_one_month(verbose=verbose)
@@ -27,6 +55,15 @@ def bake_from_class_dict(url, class_dict, one_month=False, verbose=False):
 
 
 def get_correct_class(structure_html):
+    '''parse parent class of title, content and footer
+
+    Arguments:
+        structure_html {str} -- html that represents structure of blog-post
+
+    Returns:
+        dict of str -- dict of parent class
+    '''
+
     soup = BeautifulSoup(structure_html, 'html.parser')
     return {
         'class_title': get_title_class(soup),

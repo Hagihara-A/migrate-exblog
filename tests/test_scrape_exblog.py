@@ -1,19 +1,14 @@
-import json
-from pathlib import Path
 from unittest import TestCase
-
-from migrate_exblog.utils import make_scraper
-
-ABS_PATH = Path(__file__).resolve()
-ABS_DIR = ABS_PATH.parent
 
 
 class TestScrapeExblog(TestCase):
     def setUp(self):
-        input_file = Path(ABS_DIR / 'test_input.json')
-        with input_file.open('r') as f:
-            input_data = json.load(f)
-        self.scraper = make_scraper(input_data)
+        from scrape_exblog import ScrapeExblog
+        self.class_dict = {
+            "class_title": "post-title",
+            "class_body": "post-main",
+            "class_tail": "post-tail"
+        }
 
     def test_get_indv_urls(self):
         indv_urls2018_12 = {
