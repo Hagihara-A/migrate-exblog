@@ -5,19 +5,20 @@ ABS_DIR = ABS_PATH.parent
 
 
 class ConstructMTtext:
+    """convert parsed entries to MT formatted text
+
+    Attributes:
+        make_mttext: make MT formatted text from list of parsed entries
+
+    TODO:
+        this should not be class. change to function.
+    """
+
     def __init__(self,
                  mt_template_path=ABS_DIR / 'mt_template.txt'):
-        path = self.validate_path(mt_template_path)
+        path = Path(mt_template_path)
         with path.open('r') as f:
             self.MTtemplate = f.read()
-
-    def validate_path(self, path):
-        if isinstance(path, Path):
-            return path
-        elif isinstance(path, str):
-            return Path(path)
-        else:
-            raise TypeError('path must be "str" or "pathlib.Path" object')
 
     def format_mttext(self, title, body, date, category=''):
         return self.MTtemplate.format(title=title,
