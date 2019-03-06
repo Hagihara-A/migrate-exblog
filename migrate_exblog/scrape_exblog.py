@@ -7,8 +7,10 @@ import requests
 from bs4 import BeautifulSoup, Comment
 from tqdm import tqdm
 
+INTERVAL = 0.5
 
-def get_soup(url, interval=0.5):
+
+def get_soup(url, interval=INTERVAL):
     """get soup of html in url and sleep
 
     Arguments:
@@ -43,37 +45,51 @@ class ScrapeExblog:
                  class_body,
                  class_tail,
                  class_time='TIME'):
-    """
-    Arguments:
-        url {str} -- url to scrape and parse
-        class_title {str} -- parent class of title
-        class_body {str} -- parent class of body
-        class_tail {str} -- parent class of footer
+        """
+        Arguments:
+            url {str} -- url to scrape and parse
+            class_title {str} -- parent class of title
+            class_body {str} -- parent class of body
+            class_tail {str} -- parent class of footer
 
-    Keyword Arguments:
-        class_time {str} -- footer's class placed in inner of class_tail. This is auto genereted by exblog (default: {'TIME'})
+        Keyword Arguments:
+            class_time {str} -- footer's class placed in inner of class_tail. This is auto genereted by exblog (default: {'TIME'})
 
-    Raises:
-        TypeError -- if url is not str
-    """
+        Raises:
+            TypeError -- if url is not str
+        """
 
-    self.url = self.validate_url(url)
-    self.selector_title = self.class_to_selector(class_title)
-    self.selector_body = self.class_to_selector(class_body)
-    self.selector_tail = self.class_to_selector(class_tail)
-    self.selector_time = self.class_to_selector(class_time)
+        self.url = self.validate_url(url)
+        self.selector_title = self.class_to_selector(class_title)
+        self.selector_body = self.class_to_selector(class_body)
+        self.selector_tail = self.class_to_selector(class_tail)
+        self.selector_time = self.class_to_selector(class_time)
 
-    self.date_pat = re.compile(r'^\d{4}-\d{1,2}-\d{1,2}')
-    self.tag_path_pat = re.compile(r'/i\d+/')
+        self.date_pat = re.compile(r'^\d{4}-\d{1,2}-\d{1,2}')
+        self.tag_path_pat = re.compile(r'/i\d+/')
 
     def validate_url(self, url):
         if isinstance(url, str):
             return up.urlparse(url)
         else:
             raise TypeError(
-                'url must be "str" or "urllib.parse.ParseResult" object')
+                'url must be "str" object')
 
     def class_to_selector(self, class_):
+        """convert class(html) to selector(css)
+
+        Arguments:
+            class_ {str} -- class of html attribute
+
+        Returns:
+            str -- CSS formatted selector
+
+        Example:
+            >>> s = ScrapeExblog('https://hoge.exblog', 'title', 'body', 'footer')
+            >>> s.selector_title
+            '.title'
+        """
+
         if class_.startswith('.'):
             return class_
         elif class_ is None:
@@ -215,3 +231,8 @@ class ScrapeExblog:
             if self.tag_path_pat.match(url.path):
                 return a.get_text()
         return ''
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
