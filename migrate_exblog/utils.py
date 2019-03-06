@@ -55,14 +55,14 @@ def bake_from_class_dict(url, class_dict, one_month=False, verbose=False):
 
 
 def get_correct_class(structure_html):
-    '''parse parent class of title, content and footer
+    """parse parent class of title, content and footer
 
     Arguments:
         structure_html {str} -- html that represents structure of blog-post
 
     Returns:
         dict of str -- dict of parent class
-    '''
+    """
 
     soup = BeautifulSoup(structure_html, 'html.parser')
     return {
