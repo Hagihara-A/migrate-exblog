@@ -9,9 +9,6 @@ class ConstructMTtext:
 
     Attributes:
         make_mttext: make MT formatted text from list of parsed entries
-
-    TODO:
-        this should not be class. change to function.
     """
 
     def __init__(self,
@@ -20,16 +17,37 @@ class ConstructMTtext:
         with path.open('r') as f:
             self.MTtemplate = f.read()
 
-    def format_mttext(self, title, body, date, category=''):
+    def format_mttext(self, title, body, date, category):
+        """format entries
+
+        Arguments:
+            title {str} -- title
+            body {str} -- body
+            date {datetime.datetime} -- published date
+            category {str} -- category
+
+        Returns:
+            str -- Mt formatted entries
+        """
+
         return self.MTtemplate.format(title=title,
                                       body=body,
                                       date=date.strftime('%m/%d/%Y %H:%M:%S'),
                                       category=category)
 
     def make_mttext(self, entries):
-        MTfield = ''
-        for entry in entries:
-            MTfield += self.format_mttext(**entry)
-            MTfield += '-' * 8 + '\n'
+        """make MT formatted text
 
-        return MTfield
+        Arguments:
+            entries {list of dict} -- list of dict of parsed entries
+
+        Returns:
+            str -- MT formatted text
+        """
+
+        MTtext = ''
+        for entry in entries:
+            MTtext += self.format_mttext(**entry)
+            MTtext += '-' * 8 + '\n'
+
+        return MTtext
