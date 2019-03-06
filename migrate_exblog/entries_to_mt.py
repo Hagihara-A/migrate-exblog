@@ -28,6 +28,14 @@ class ConstructMTtext:
 
         Returns:
             str -- Mt formatted entries
+
+        Example:
+            >>> from migrate_exblog.entries_to_mt import ConstructMTtext
+            >>> from datetime import datetime
+            >>> formatter = ConstructMTtext()
+            >>> entry = {'title': 'this is title', 'body': 'this is body', 'date': datetime(2000,1,1,1,1), 'category': 'sample category'}
+            >>> formatter.format_mttext(**entry)
+            'TITLE: this is title\\nSTATUS: Publish\\nDATE: 01/01/2000 01:01:00\\nCATEGORY: sample category\\n-----\\nBODY:\\nthis is body\\n-----\\n'
         """
 
         return self.MTtemplate.format(title=title,
@@ -51,3 +59,8 @@ class ConstructMTtext:
             MTtext += '-' * 8 + '\n'
 
         return MTtext
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
