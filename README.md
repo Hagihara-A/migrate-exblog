@@ -59,7 +59,12 @@ optional arguments:
 ``migrate-exblog make-conf``とすることでカレントディレクトリに``conf.json``というテンプレートが生成されます。
 
 テンプレートの内容は以下のようになっています
-```json
+```bash
+$ ls
+$ migrate-exblog make-conf
+$ ls
+conf.json
+$ cat conf.json
 {
   "class_title": "post-title",
   "class_body": "post-main",
