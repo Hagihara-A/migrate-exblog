@@ -5,7 +5,7 @@ with open('README.md', 'r') as f:
 
 setup(
     name='migrate-exblog',
-    version='1.0.1',
+    version='2.0.0',
     packages=find_packages(),
     long_description=long_description,
     python_requires='>=3.4',
