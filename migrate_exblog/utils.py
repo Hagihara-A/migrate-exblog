@@ -62,6 +62,9 @@ def get_correct_class(structure_html):
 
     Returns:
         dict of str -- dict of parent class
+
+    TODO:
+        Deal with card-type design.Now, if design is card-type, this would thorow Exeption.
     """
 
     soup = BeautifulSoup(structure_html, 'html.parser')
@@ -85,4 +88,12 @@ def get_tail_class(soup):
 
 
 def parent_class(soup, pattern):
-    return soup.find(text=pattern).parent.get('class')[0]
+    tags = soup.find_all(text=pattern)
+    if len(tags) == 1:
+        class_ = tags[0].parent.get('class')
+        if len(class_) == 1:
+            return class_[0]
+        else:
+            raise Exception(f'too many or 0 class found ->{class_}')
+    else:
+        raise Exception(f'found too many or 0 tags found ->{tags}')
