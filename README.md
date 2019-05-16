@@ -5,7 +5,7 @@
 現在、タイトル・本文・投稿日時・カテゴリのエクスポートには対応していますが、コメント・その他の要素については対応していません。
 ## クイックスタート
 ```bash
-pip install git+https://github.com/Hagihara-A/migrate-exblog
+pip install git+https://github.com/Hagihara-A/migrate-exblog#egg=migrate_exblog
 migrate-exblog --url=<url>
 ```
 これだけでエクスポートが出来ます。
