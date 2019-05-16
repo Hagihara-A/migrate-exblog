@@ -1,8 +1,8 @@
 # migrate-exblog
-エキサイトブログをmovable type形式で出力するスクリプト
+エキサイトブログから他のブログへ引っ越しするスクリプト。エキサイトブログにあるコンテンツをmovable type形式で出力します。
 ## 概要
 エキサイトブログにはエクスポート機能がないのでスクレイピングしてmovable type(MT)形式で出力します。(FC2を使ってもエクスポートは可能です。)
-現在、タイトル・本文・投稿日時・カテゴリのエクスポートには対応していますが、コメント・その他の要素については対応していません。
+現在、タイトル・本文・投稿日時・カテゴリのエクスポートには対応していますが、コメント・画像・その他の要素については対応していません。はてなブログは画像の引っ越しまでやってくれるのを確認済みです。
 ## クイックスタート
 ```bash
 pip install git+https://github.com/Hagihara-A/migrate-exblog#egg=migrate_exblog
@@ -74,7 +74,7 @@ $ cat conf.json
 これは https://staff.exblog.jp/ のクラスを指定したものになります。自身で指定する際はこれを参考にして間違えないようにしてください。
 ## デモ
 ```bash
-$ pip install git+https://github.com/Hagihara-A/migrate-exblog
+pip install git+https://github.com/Hagihara-A/migrate-exblog#egg=migrate_exblog
 $ migate-exblog　make-conf
 $ ls
 conf.json
